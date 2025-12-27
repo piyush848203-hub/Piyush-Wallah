@@ -18,7 +18,88 @@ html,body{margin:0;background:var(--bg);color:var(--ink);scroll-behavior:smooth}
 /* ===============================
    SEARCH BOX COLOUR ANIMATION
    =============================== */
+/* ===== Three Dot Menu ===== */
+/* ===== Motivation Horizontal Cards ===== */
+.motivation-row{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding:10px 2px 14px;
+  scroll-snap-type:x mandatory;
+}
 
+.motivation-row::-webkit-scrollbar{
+  display:none;
+}
+
+.motivation-card{
+  min-width:260px;
+  height:140px;
+  border-radius:18px;
+  overflow:hidden;
+  position:relative;
+  scroll-snap-align:start;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+
+.motivation-card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.motivation-text{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.75),
+    rgba(0,0,0,.15)
+  );
+  color:#fff;
+  font-weight:900;
+  font-size:15px;
+  display:flex;
+  align-items:flex-end;
+  padding:14px;
+  line-height:1.3;
+}
+.menu-wrap{
+  position:relative;
+}
+.menu-btn{
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  padding:6px 10px;
+  border-radius:10px;
+}
+.menu-btn:active{
+  background:var(--ring);
+}
+
+.menu-dropdown{
+  position:absolute;
+  top:42px;
+  left:0;
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.15);
+  border:1px solid #e7ecf7;
+  display:none;
+  z-index:500;
+  min-width:220px;
+  overflow:hidden;
+}
+
+.menu-item{
+  padding:12px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.menu-item:hover{
+  background:#f1f5ff;
+}
 .animated-search{
   position:relative;
   border-radius:18px;
@@ -267,8 +348,17 @@ label{display:block;font-size:12px;color:var(--muted);margin:8px 0 6px}
 
 <div id="pageApp" class="page">
   <div class="wrap">
-    <header>
-      <div class="brand">
+   <header>
+  <!-- THREE DOT MENU -->
+  <div class="menu-wrap">
+    <div id="menuBtn" class="menu-btn">⋮</div>
+    <div id="menuDropdown" class="menu-dropdown">
+      <div class="menu-item" id="ytJoin">📺 Join our YouTube Channel</div>
+      <div class="menu-item" id="waJoin">💬 Join our WhatsApp Channel</div>
+    </div>
+  </div>
+
+  <div class="brand">
         <div class="logo">PW</div>
         <div class="hgroup">
           <h1>Powered By — MadXPiyush</h1>
@@ -278,8 +368,21 @@ label{display:block;font-size:12px;color:var(--muted);margin:8px 0 6px}
       <div id="avatar" title="View / Edit Profile">PW</div>
     </header>
 
-    <div class="searchWrap animated-search">
-  <input id="searchBox" class="search" placeholder="Search lectures or notes…"/>
+<!-- MOTIVATION BANNER ROW -->
+<div class="motivation-row">
+  <div class="motivation-card">
+    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1" />
+    <div class="motivation-text">
+      “Success is the result of daily discipline 📚”
+    </div>
+  </div>
+
+  <div class="motivation-card">
+    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b" />
+    <div class="motivation-text">
+      “Aaj padhoge tabhi kal jeetoge 🔥”
+    </div>
+  </div>
 </div>
 
     <section id="home" class="page active">
@@ -537,7 +640,35 @@ const db=firebase.database();
 <script>
 const $ = id => document.getElementById(id);
 let navStack = ['home'];
+/* ===== Three Dot Menu Logic ===== */
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
 
+menuBtn.onclick = (e)=>{
+  e.stopPropagation();
+  menuDropdown.style.display =
+    menuDropdown.style.display === 'block' ? 'none' : 'block';
+};
+
+// Close on outside click
+document.addEventListener('click', ()=>{
+  menuDropdown.style.display = 'none';
+});
+
+// Redirects
+document.getElementById('ytJoin').onclick = ()=>{
+  window.open(
+    'https://youtube.com/@study_hack_4u_0?si=kN7yyW9egcG7Iwxz',
+    '_blank'
+  );
+};
+
+document.getElementById('waJoin').onclick = ()=>{
+  window.open(
+    'https://whatsapp.com/channel/0029VbBfdvY4o7qLnDcNTg26',
+    '_blank'
+  );
+};
 function go(id){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
