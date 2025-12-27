@@ -1,0 +1,1529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Piyush Wallah — Final App</title>
+
+<style>
+:root{
+  --bg:#f6f8ff; --card:#ffffff; --ink:#0b1220; --muted:#667085;
+  --accent:#2563eb; --accent2:#7c3aed; --ring:rgba(37,99,235,.10);
+  --shadow:0 10px 28px rgba(16,24,40,.08);
+  --green:#10b981; --red:#ef4444;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);scroll-behavior:smooth}
+/* ===============================
+   SEARCH BOX COLOUR ANIMATION
+   =============================== */
+/* ===== Three Dot Menu ===== */
+/* ===== Motivation Horizontal Cards ===== */
+.motivation-row{
+  display:flex;
+  gap:14px;
+  overflow-x:auto;
+  padding:10px 2px 14px;
+  scroll-snap-type:x mandatory;
+}
+
+.motivation-row::-webkit-scrollbar{
+  display:none;
+}
+
+.motivation-card{
+  min-width:260px;
+  height:140px;
+  border-radius:18px;
+  overflow:hidden;
+  position:relative;
+  scroll-snap-align:start;
+  box-shadow:0 10px 24px rgba(0,0,0,.18);
+}
+
+.motivation-card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.motivation-text{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(0,0,0,.75),
+    rgba(0,0,0,.15)
+  );
+  color:#fff;
+  font-weight:900;
+  font-size:15px;
+  display:flex;
+  align-items:flex-end;
+  padding:14px;
+  line-height:1.3;
+}
+.menu-wrap{
+  position:relative;
+}
+.menu-btn{
+  font-size:22px;
+  font-weight:900;
+  cursor:pointer;
+  padding:6px 10px;
+  border-radius:10px;
+}
+.menu-btn:active{
+  background:var(--ring);
+}
+
+.menu-dropdown{
+  position:absolute;
+  top:42px;
+  left:0;
+  background:#fff;
+  border-radius:14px;
+  box-shadow:0 10px 28px rgba(0,0,0,.15);
+  border:1px solid #e7ecf7;
+  display:none;
+  z-index:500;
+  min-width:220px;
+  overflow:hidden;
+}
+
+.menu-item{
+  padding:12px 14px;
+  font-weight:700;
+  cursor:pointer;
+}
+.menu-item:hover{
+  background:#f1f5ff;
+}
+.animated-search{
+  position:relative;
+  border-radius:18px;
+  padding:2px;
+  background:linear-gradient(
+    90deg,
+    #2563eb,
+    #7c3aed,
+    #22c55e,
+    #f59e0b,
+    #2563eb
+  );
+  background-size:300% 300%;
+  animation:searchGlow 6s linear infinite;
+}
+
+@keyframes searchGlow{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+.animated-search .search{
+  border-radius:16px;
+  background:#fff;
+}
+
+/* Focus par glow */
+.animated-search:focus-within{
+  animation-duration:3s;
+  box-shadow:0 0 0 6px rgba(37,99,235,.15);
+}
+/* pages */
+/* Best Transition Effect: Fade-in + Smooth Slide Up */
+.page{
+  display:none;
+  opacity:0;
+  transform:translateY(20px); /* Increased offset for more visible slide */
+  transition:opacity .4s ease-out,transform .4s cubic-bezier(0.22, 1, 0.36, 1); /* Smoother, longer transition */
+}
+.page.active{display:block;opacity:1;transform:translateY(0)}
+
+/* container */
+.wrap{max-width:920px;margin:0 auto;padding:14px}
+
+/* header */
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{
+  width:48px;height:48px;border-radius:12px;color:#fff;font-weight:900;letter-spacing:.2px;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));box-shadow:var(--shadow)
+}
+.hgroup h1{margin:0;font-size:18px}
+.hgroup .sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* avatar initials (top-right) */
+#avatar{
+  width:40px;height:40px;border-radius:50%;color:#fff;font-weight:800;font-size:15px;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+  background:conic-gradient(from 0deg, var(--accent), var(--accent2));
+  box-shadow:0 6px 16px rgba(37,99,235,.25); animation:pulse 2.5s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+
+/* search */
+.searchWrap{margin:12px 0}
+.search{
+  width:100%;padding:12px 14px;border-radius:12px;border:1px solid #d7def0;background:#fff;
+  transition:box-shadow .25s,border-color .25s;
+}
+.search:focus{border-color:#c7d2fe;box-shadow:0 0 0 6px var(--ring)}
+
+/* grid cards (home) - Unique look for Home */
+/* ALL CARDS → FULL WIDTH VERTICAL */
+.grid{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+@keyframes glow{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.card{
+  width:100%;
+  min-height:110px;
+  padding:16px;
+  border-radius:18px;
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  gap:16px;
+
+  background:linear-gradient(
+    135deg,
+    rgba(37,99,235,.20),
+    rgba(124,58,237,.20),
+    rgba(34,197,94,.20),
+    rgba(245,158,11,.20)
+  );
+  background-size:300% 300%;
+  animation:glow 6s ease infinite;
+
+  box-shadow:0 10px 26px rgba(16,24,40,.12);
+  transition:.25s;
+}
+.card:active{transform:scale(.97)}
+.card:hover{transform:translateY(-3px)}
+
+.card .icon{
+  width:56px;
+  height:56px;
+  border-radius:14px;
+  background:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:26px;
+  box-shadow:0 6px 14px rgba(0,0,0,.15);
+}
+.card .label{font-weight:900; font-size: 16px;} 
+.card .hint{font-size:12px;color:var(--muted); margin-top: 2px;}
+
+/* lists */
+.list{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.item{
+  background:#fff;border-radius:14px;border:1px solid #e7ecf7;box-shadow:0 6px 16px rgba(16,24,40,.05);
+  padding:12px;display:flex;gap:12px;align-items:center
+}
+.thumb{width:120px;height:78px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#eef3ff;border:1px solid #e3eaf9;display:flex;align-items:center;justify-content:center}
+.thumb img{width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s}
+.thumb img.loaded{opacity:1}
+.info{flex:1;min-width:0}
+.info .title{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info .meta{font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px}
+.actions{display:flex;gap:8px}
+
+/* buttons */
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));border:0;color:#fff;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer}
+.ghost{border:1px solid #e3eaf9;background:#fff;color:#475569;padding:10px 14px;border-radius:12px;cursor:pointer}
+
+/* modal backdrop (admin & profile edit) */
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:400}
+.modal{background:#fff;border-radius:16px;border:1px solid #e7ecf7;box-shadow:var(--shadow);
+  width:min(960px,94vw);max-height:92vh;overflow:auto;padding:16px}
+
+/* forms */
+label{display:block;font-size:12px;color:var(--muted);margin:8px 0 6px}
+.input,select,textarea{width:100%;padding:12px;border-radius:12px;border:1px solid #d7def0;background:#fff}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1 1 260px}
+
+/* persistent bottom back */
+#backBtn{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
+  background:#fff;border:1px solid #d7def0;border-radius:14px;box-shadow:0 6px 20px rgba(0,0,0,.12);
+  padding:10px 18px;font-weight:800;z-index:350;cursor:pointer
+}
+
+/* login card */
+.center{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+.card-lg{
+  width:min(420px,94vw);background:#fff;border:1px solid #e7ecf7;border-radius:18px;padding:22px;box-shadow:0 10px 28px rgba(16,24,40,.10)
+}
+.card-lg h2{margin:0 0 6px;text-align:center}
+.note{font-size:12px;color:var(--muted);text-align:center}
+.small{font-size:12px;color:var(--muted)}
+.bad{display:none;background:#fee2e2;border:1px solid #fecaca;color:#b91c1c;padding:8px;border-radius:10px;margin-top:8px;font-size:13px;text-align:center}
+
+/* ADMIN specific UI (Professional Tabs) */
+.tabs{display:flex;border-bottom:1px solid #e7ecf7;gap:20px;margin:16px 0 0}
+.tab-btn{
+  padding:10px 0;font-weight:700;cursor:pointer;color:var(--muted);border-bottom:3px solid transparent;
+  transition:border-color .25s,color .25s;
+}
+.tab-btn.active{color:var(--accent2);border-bottom-color:var(--accent2)}
+.tab-content{display:none;padding-top:16px}
+.tab-content.active{display:block}
+
+/* ------------------------------------------------ */
+/* --- NEW STYLES FOR RED THANK YOU BANNER (POPUP) --- */
+/* ------------------------------------------------ */
+.thank-you-banner {
+  margin-top: 16px;
+  background-color: var(--red); /* Red color */
+  color: #fff;
+  padding: 10px 0;
+  border-radius: 12px;
+  overflow: hidden; /* To hide the text outside the scrollable area */
+  white-space: nowrap;
+  font-weight: 900;
+  font-size: 16px;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.5); /* Attractive red shadow */
+  text-align: center; /* Center the text container */
+}
+
+.thank-you-marquee {
+  /* This element creates the scrolling effect */
+  display: inline-block;
+  padding-left: 100%; /* Start the text off-screen to the right */
+  animation: marquee 10s linear infinite; /* 10s loop, constant speed, infinite repeat */
+}
+
+@keyframes marquee {
+  /* Scroll the element exactly 100% of its own width to the left */
+  0%   { transform: translate(0, 0); }
+  100% { transform: translate(-100%, 0); } 
+}
+/* ------------------------------------------------ */
+</style>
+</head>
+<body>
+
+<div id="pageLogin" class="page active">
+  <div class="center">
+    <div class="card-lg">
+      <h2>Student Login</h2>
+      <div class="note">Apna mobile number daaliye. OTP nahi — direct login. Session 30 din tak active rahega.</div>
+      <label>Mobile Number</label>
+      <input id="mob" class="input" maxlength="10" placeholder="10-digit mobile"/>
+      <button class="btn" id="btnStudentLogin" style="margin-top:10px">Continue</button>
+
+      <div style="margin-top:14px;text-align:center">
+        <button id="openAdminFromLogin" class="ghost" style="width:100%">Admin Login</button>
+        <div class="small" style="margin-top:6px">Only Access for <b>Piyush ji</b></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="pageProfile" class="page">
+  <div class="center">
+    <div class="card-lg">
+      <h2>Create Profile</h2>
+      <div class="note">Name, city, gender, email — baad me edit bhi kar sakte ho.</div>
+      <label>Full Name</label><input id="p_name" class="input" placeholder="e.g. Rahul Sharma"/>
+      <label>City</label><input id="p_city" class="input" placeholder="e.g. Jaipur"/>
+      <label>Gender</label>
+      <select id="p_gender" class="input">
+        <option value="">Select</option><option>Male</option><option>Female</option><option>Other</option>
+      </select>
+      <label>Email</label><input id="p_email" type="email" class="input" placeholder="e.g. you@example.com"/>
+      <button class="btn" id="btnSaveProfile" style="margin-top:12px">Save & Go Home</button>
+    </div>
+  </div>
+</div>
+
+<div id="pageApp" class="page">
+  <div class="wrap">
+   <header>
+  <!-- THREE DOT MENU -->
+  <div class="menu-wrap">
+    <div id="menuBtn" class="menu-btn">⋮</div>
+    <div id="menuDropdown" class="menu-dropdown">
+      <div class="menu-item" id="ytJoin">📺 Join our YouTube Channel</div>
+      <div class="menu-item" id="waJoin">💬 Join our WhatsApp Channel</div>
+    </div>
+  </div>
+
+  <div class="brand">
+        <div class="logo">PW</div>
+        <div class="hgroup">
+          <h1>Powered By — MadXPiyush</h1>
+          <div class="sub">Smooth UI • For Students</div>
+        </div>
+      </div>
+      <div id="avatar" title="View / Edit Profile">PW</div>
+    </header>
+
+<!-- MOTIVATION BANNER ROW -->
+<div class="motivation-row">
+  <div class="motivation-card">
+    <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1" />
+    <div class="motivation-text">
+      “Success is the result of daily discipline 📚”
+    </div>
+  </div>
+
+  <div class="motivation-card">
+    <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b" />
+    <div class="motivation-text">
+      “Aaj padhoge tabhi kal jeetoge 🔥”
+    </div>
+  </div>
+</div>
+
+    <section id="home" class="page active">
+      <div class="grid">
+        <div class="card" data-nav="batch"><div class="icon">🚀</div><div class="label">My Batch</div><div class="hint">Class 10 / 11 / 12</div></div>
+        <div class="card" data-nav="notes"><div class="icon">📚</div><div class="label">Notes Library</div><div class="hint">Class 9–12 (filter)</div></div>
+        <div class="card" data-nav="anns"><div class="icon">📢</div><div class="label">Announcements</div><div class="hint">Important Updates</div></div>
+        <div class="card" data-nav="about"><div class="icon">👤</div><div class="label">Know Your Mentor</div><div class="hint">MadXpiyush</div></div>
+        <div class="card" data-nav="contact"><div class="icon">📧</div><div class="label">Contact Support</div><div class="hint">Click to DM</div></div>
+        <div class="card" data-nav="admin"><div class="icon">⚙️</div><div class="label">Admin Panel</div><div class="hint">Access Control</div></div>
+      </div>
+      
+      <div class="thank-you-banner">
+        <div class="thank-you-marquee">
+          ⭐⭐⭐ THANK YOU FOR USING PIYUSHWALLAH APP! ⭐⭐⭐
+        </div>
+      </div>
+      </section>
+
+    <section id="batch" class="page">
+      <div class="grid">
+        <div class="card" data-nav="cls10"><div class="icon">🔟</div><div class="label">Class 10</div></div>
+        <div class="card" data-nav="cls11"><div class="icon">🎓</div><div class="label">Class 11</div></div>
+        <div class="card" data-nav="cls12"><div class="icon">👨‍🎓</div><div class="label">Class 12</div></div>
+      </div>
+    </section>
+
+    <section id="cls10" class="page">
+      <div class="grid">
+        <div class="card subj" data-class="10" data-subject="Physics"><div class="icon">⚛️</div><div class="label">Physics X</div></div>
+        <div class="card subj" data-class="10" data-subject="Chemistry"><div class="icon">🧪</div><div class="label">Chemistry X</div></div>
+        <div class="card subj" data-class="10" data-subject="Math"><div class="icon">➗</div><div class="label">Math X</div></div>
+        <div class="card subj" data-class="10" data-subject="Biology"><div class="icon">🧬</div><div class="label">Biology X</div></div>
+        <div class="card subj" data-class="10" data-subject="English"><div class="icon">📝</div><div class="label">English X</div></div>
+        <div class="card subj" data-class="10" data-subject="Hindi"><div class="icon">🔤</div><div class="label">Hindi X</div></div>
+      </div>
+    </section>
+    
+    <section id="cls11" class="page">
+      <div class="grid">
+        <div class="card subj" data-class="11" data-subject="Physics"><div class="icon">⚛️</div><div class="label">Physics XI</div></div>
+        <div class="card subj" data-class="11" data-subject="Chemistry"><div class="icon">🧪</div><div class="label">Chemistry XI</div></div>
+        <div class="card subj" data-class="11" data-subject="Math"><div class="icon">➗</div><div class="label">Math XI</div></div>
+        <div class="card subj" data-class="11" data-subject="Biology"><div class="icon">🧬</div><div class="label">Biology XI</div></div>
+      </div>
+    </section>
+
+    <section id="cls12" class="page">
+      <div class="grid">
+        <div class="card subj" data-class="12" data-subject="Physics"><div class="icon">⚛️</div><div class="label">Physics XII</div></div>
+        <div class="card subj" data-class="12" data-subject="Chemistry"><div class="icon">🧪</div><div class="label">Chemistry XII</div></div>
+        <div class="card subj" data-class="12" data-subject="Math"><div class="icon">➗</div><div class="label">Math XII</div></div>
+        <div class="card subj" data-class="12" data-subject="Biology"><div class="icon">🧬</div><div class="label">Biology XII</div></div>
+        <div class="card subj" data-class="12" data-subject="English"><div class="icon">📝</div><div class="label">English XII</div></div>
+        <div class="card subj" data-class="12" data-subject="Hindi"><div class="icon">🔤</div><div class="label">Hindi XII</div></div>
+      </div>
+    </section>
+    
+    <section id="chapterList" class="page">
+      <div class="item"><div class="info"><div id="chapterListTitle" class="title"></div><div id="chapterListMeta" class="meta"></div></div></div>
+      <div id="chaptersGrid" class="grid" style="grid-template-columns:repeat(2,1fr)"></div>
+    </section>
+
+    <section id="subjectList" class="page">
+      <div class="item"><div class="info"><div id="subjectTitle" class="title"></div><div id="subjectMeta" class="meta"></div></div></div>
+      <div id="subjectLectures" class="list"></div>
+    </section>
+
+    <section id="notes" class="page">
+      <div class="row" style="margin:6px 0">
+        <div class="col">
+          <label>Class Filter</label>
+          <select id="filterClass" class="input">
+            <option value="">All</option><option>9</option><option>10</option><option>11</option><option>12</option>
+          </select>
+        </div>
+        <div class="col">
+          <label>Subject Filter</label>
+          <select id="filterSubject" class="input">
+            <option value="">All</option>
+            <option>Physics</option><option>Chemistry</option><option>Math</option><option>Biology</option>
+            <option>English</option><option>Hindi</option>
+          </select>
+        </div>
+        <div class="col" style="align-self:flex-end"><button id="applyNotesFilter" class="ghost" style="width:100%">Apply Filter</button></div>
+      </div>
+      <div id="notesList" class="list"></div>
+    </section>
+
+    <section id="anns" class="page"><div id="annsList" class="list"></div></section>
+
+    <section id="about" class="page">
+      <div class="item"><div class="info"><div class="title">Admin: Piyush ji</div><div class="meta">Know your admin & mentor</div></div></div>
+    </section>
+
+    <section id="contact" class="page">
+      <div id="contactLinkItem" class="item">
+        <div class="info">
+          <div class="title">Support on Instagram</div>
+          <div class="meta"><a id="contactLinkDisplay" href="#" target="_blank">Loading link...</a></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<button id="backBtn">← Back</button>
+
+<div id="profileModal" class="backdrop">
+  <div class="modal" style="max-width:560px">
+    <h3>Profile</h3>
+    <div class="row" style="margin-top:8px">
+      <div class="col"><label>Full Name</label><input id="e_name" class="input"/></div>
+      <div class="col"><label>City</label><input id="e_city" class="input"/></div>
+      <div class="col"><label>Gender</label>
+        <select id="e_gender" class="input"><option>Male</option><option>Female</option><option>Other</option></select></div>
+      <div class="col"><label>Email</label><input id="e_email" type="email" class="input"/></div>
+    </div>
+    <div class="row" style="margin-top:12px">
+      <div class="col"><button id="btnUpdateProfile" class="btn" style="width:100%">Update</button></div>
+      <div class="col"><button id="btnCloseProfile" class="ghost" style="width:100%">Close</button></div>
+    </div>
+  </div>
+</div>
+
+<div id="adminModal" class="backdrop">
+  <div class="modal">
+    <div id="adminLoginBlock">
+      <h3>Admin Login</h3>
+      <input id="adminPass" class="input" placeholder="Enter password"/>
+      <button id="adminLoginBtn" class="btn" style="margin-top:8px">Login</button>
+      <div id="denied" class="bad">Access Denied — wrong password.</div>
+      <div class="small" style="margin-top:6px">Only Access for <b>MadXPiyush</b></div>
+    </div>
+
+    <div id="adminPanel" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <h2>Admin Panel</h2>
+        <button id="adminLogoutBtn" class="ghost">Logout</button>
+      </div>
+
+      <div class="tabs">
+        <div class="tab-btn active" data-tab="tabLectures">Lectures</div>
+        <div class="tab-btn" data-tab="tabNotes">Notes</div>
+        <div class="tab-btn" data-tab="tabAnnouncements">Announcements</div>
+        <div class="tab-btn" data-tab="tabSettings">Settings</div>
+      </div>
+
+      <div id="tabLectures" class="tab-content active">
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <h3>Add / Edit Lecture</h3>
+            <label>Class</label><select id="lecClass" class="input"><option>10</option><option>11</option><option>12</option></select>
+            <label>Subject</label>
+            <select id="lecSubject" class="input">
+              <option>Physics</option><option>Chemistry</option><option>Math</option><option>Biology</option>
+              <option>English</option><option>Hindi</option>
+            </select>
+            <label>Chapter</label>
+            <select id="lecChapter" class="input"></select>
+            <label>Title</label><input id="lecTitle" class="input" placeholder="Lecture Title"/>
+            <label>Video or PDF Link</label><input id="lecLink" class="input" placeholder="https://..."/>
+            <label>Thumbnail URL (optional)</label><input id="lecThumb" class="input" placeholder="https://..."/>
+            <div class="row" style="margin-top:10px">
+              <div class="col"><button id="saveLectureBtn" class="btn" style="width:100%">Save</button></div>
+              <div class="col"><button id="updateLectureBtn" class="ghost" style="width:100%" disabled>Update</button></div>
+              <div class="col"><button id="cancelLectureEditBtn" class="ghost" style="width:100%" disabled>Cancel</button></div>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Manage Lectures (Filter)</h3>
+            <div class="row">
+              <div class="col">
+                <label>Filter Class</label>
+                <select id="filterLecClass" class="input">
+                  <option value="">All</option><option>10</option><option>11</option><option>12</option>
+                </select>
+              </div>
+              <div class="col">
+                <label>Filter Subject</label>
+                <select id="filterLecSubject" class="input">
+                  <option value="">All</option>
+                  <option>Physics</option><option>Chemistry</option><option>Math</option><option>Biology</option>
+                  <option>English</option><option>Hindi</option>
+                </select>
+              </div>
+            </div>
+            <div id="adminLectures" class="list" style="margin-top:10px;"></div>
+            <div id="lecFilterInfo" class="small" style="text-align:center; margin-top:10px; color:var(--red);">Select Class and Subject to view lectures.</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tabNotes" class="tab-content">
+        <div class="row" style="margin-top:10px">
+          <div class="col">
+            <h3>Add / Edit Note</h3>
+            <label>Class</label><select id="noteClass" class="input"><option>9</option><option>10</option><option>11</option><option>12</option></select>
+            <label>Subject</label>
+            <select id="noteSubject" class="input">
+              <option>Physics</option><option>Chemistry</option><option>Math</option><option>Biology</option>
+              <option>English</option><option>Hindi</option>
+            </select>
+            <label>Title</label><input id="noteTitle" class="input" placeholder="Note Title"/>
+            <label>PDF Link</label><input id="noteLink" class="input" placeholder="https://...pdf"/>
+            <div class="row" style="margin-top:10px">
+              <div class="col"><button id="saveNoteBtn" class="btn" style="width:100%">Save</button></div>
+              <div class="col"><button id="updateNoteBtn" class="ghost" style="width:100%" disabled>Update</button></div>
+              <div class="col"><button id="cancelNoteEditBtn" class="ghost" style="width:100%" disabled>Cancel</button></div>
+            </div>
+          </div>
+          <div class="col">
+            <h3>Manage Notes</h3>
+            <div id="adminNotes" class="list"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tabAnnouncements" class="tab-content">
+        <h3 style="margin-top:16px">Post New Announcement</h3>
+        <label>Title</label><input id="annTitle" class="input" placeholder="e.g. Important: JEE Mains Date Change"/>
+        <label>Message</label><textarea id="annBody" class="input" placeholder="Detailed message..."></textarea>
+        <label>Optional Link URL</label><input id="annLink" class="input" placeholder="https://... (e.g. for a PDF or video)"/>
+        <button id="postAnnBtn" class="btn" style="margin-top:10px">Post Announcement</button>
+        <h3 style="margin-top:16px">Past Announcements</h3>
+        <div id="adminAnns" class="list"></div>
+      </div>
+
+      <div id="tabSettings" class="tab-content">
+        <h3 style="margin-top:16px">Contact Support Link</h3>
+        <label>Instagram/Support Link</label>
+        <input id="supportLinkInput" class="input" placeholder="e.g. https://instagram.com/yourhandle"/>
+        <button id="saveSupportLinkBtn" class="btn" style="margin-top:10px">Save Link</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+/* SAME FIREBASE CONFIG */
+firebase.initializeApp({
+  apiKey:"AIzaSyDYOL-VbJ9uG28M4dODV4ZFyj-1yaq-_BM",
+  authDomain:"piyushwallah-6f01a.firebaseapp.com",
+  databaseURL:"https://piyushwallah-6f01a-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId:"piyushwallah-6f01a",
+  storageBucket:"piyushwallah-6f01a.firebasestorage.app",
+  messagingSenderId:"282204860575",
+  appId:"1:282204860575:web:6e1bd05ae1e5091c32f2aa"
+});
+const db=firebase.database();
+</script>
+
+<script>
+const $ = id => document.getElementById(id);
+let navStack = ['home'];
+/* ===== Three Dot Menu Logic ===== */
+const menuBtn = document.getElementById('menuBtn');
+const menuDropdown = document.getElementById('menuDropdown');
+
+menuBtn.onclick = (e)=>{
+  e.stopPropagation();
+  menuDropdown.style.display =
+    menuDropdown.style.display === 'block' ? 'none' : 'block';
+};
+
+// Close on outside click
+document.addEventListener('click', ()=>{
+  menuDropdown.style.display = 'none';
+});
+
+// Redirects
+document.getElementById('ytJoin').onclick = ()=>{
+  window.open(
+    'https://youtube.com/@study_hack_4u_0?si=kN7yyW9egcG7Iwxz',
+    '_blank'
+  );
+};
+
+document.getElementById('waJoin').onclick = ()=>{
+  window.open(
+    'https://whatsapp.com/channel/0029VbBfdvY4o7qLnDcNTg26',
+    '_blank'
+  );
+};
+function go(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  if(navStack[navStack.length-1] !== id){
+    navStack.push(id);
+    history.pushState({page:id},'', '#'+id);
+  }
+}
+
+function goBack(){
+  if(navStack.length > 1){
+    navStack.pop();
+    const prev = navStack[navStack.length-1];
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+  }
+}
+/* ===============================
+   LIVE SEARCH (ANIMATION SAFE)
+   =============================== */
+
+const searchInput = document.getElementById('searchBox');
+
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+
+    // 🔹 Lecture list page active ho to
+    if (document.getElementById('subjectList')?.classList.contains('active')) {
+      liveSearchLectures(q);
+    }
+
+    // 🔹 Notes page active ho to
+    if (document.getElementById('notes')?.classList.contains('active')) {
+      liveSearchNotes(q);
+    }
+  });
+}
+
+function liveSearchLectures(query){
+  const box = document.getElementById('subjectLectures');
+  if (!box) return;
+
+  box.querySelectorAll('.item').forEach(item=>{
+    item.style.display =
+      item.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+  });
+}
+
+function liveSearchNotes(query){
+  const box = document.getElementById('notesList');
+  if (!box) return;
+
+  box.querySelectorAll('.item').forEach(item=>{
+    item.style.display =
+      item.innerText.toLowerCase().includes(query) ? 'flex' : 'none';
+  });
+}
+document.getElementById('backBtn').onclick = goBack;
+
+window.onpopstate = function(){
+  if(navStack.length > 1){
+    navStack.pop();
+    const prev = navStack[navStack.length-1];
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(prev).classList.add('active');
+  }
+};
+// UPDATED: Chapter List Hardcoded (Class 10 English list updated)
+const CHAPTERS = {
+  '10': {
+    'Physics': [
+      'C1: Light - Reflection and Refraction (NCERT)', 
+      'C2: Human Eye and Colourful World (NCERT)', 
+      'C3: Electricity (NCERT)', 
+      'C4: Magnetic Effects of Electric Current (NCERT)',
+      'C5: Sources of Energy (NCERT)'
+    ],
+    'Chemistry': [
+      'C1: Chemical Reactions and Equations (NCERT)', 
+      'C2: Acids, Bases and Salts (NCERT)', 
+      'C3: Metals and Non-Metals (NCERT)', 
+      'C4: Carbon and its Compounds (NCERT)',
+      'C5: Periodic Classification of Elements (NCERT)'
+    ],
+    'Math': [
+      'C1: Real Numbers (NCERT)', 'C2: Polynomials (NCERT)', 'C3: Pair of Linear Equations (NCERT)', 
+      'C4: Quadratic Equations (NCERT)', 'C5: Arithmetic Progressions (NCERT)', 'C6: Triangles (NCERT)',
+      'C7: Coordinate Geometry (NCERT)', 'C8: Introduction to Trigonometry (NCERT)',
+      'C9: Some Applications of Trigonometry (NCERT)', 'C10: Circles (NCERT)',
+      'C11: Areas Related to Circles (NCERT)', 'C12: Surface Areas and Volumes (NCERT)',
+      'C13: Statistics (NCERT)', 'C14: Probability (NCERT)'
+    ],
+    'Biology': [
+      'C1: Life Processes (NCERT)', 'C2: Control and Coordination (NCERT)', 'C3: How do Organisms Reproduce? (NCERT)', 
+      'C4: Heredity and Evolution (NCERT)', 'C5: Our Environment (NCERT)',
+      'C6: Management of Natural Resources (NCERT)'
+    ],
+    // *** UPDATED CLASS 10 ENGLISH CHAPTERS ***
+    'English': [
+      'First Flight (P): A Letter to God', 'First Flight (P): Nelson Mandela: Long Walk to Freedom', 
+      'First Flight (P): Two Stories about Flying', 'First Flight (P): From the Diary of Anne Frank',
+      'First Flight (P): The Hundred Dresses–I', 'First Flight (P): The Hundred Dresses–II',
+      'First Flight (P): Glimpses of India', 'First Flight (P): Mijbil the Otter',
+      'First Flight (P): Madam Rides the Bus', 'First Flight (P): The Sermon at Benares',
+      'First Flight (P): The Proposal (Play)',
+      'First Flight (Poem): Dust of Snow', 'First Flight (Poem): Fire and Ice', 'First Flight (Poem): A Tiger in the Zoo', 
+      'First Flight (Poem): How to Tell Wild Animals', 'First Flight (Poem): The Ball Poem', 'First Flight (Poem): Amanda!',
+      'First Flight (Poem): Animals', 'First Flight (Poem): The Trees', 'First Flight (Poem): Fog',
+      'First Flight (Poem): The Tale of Custard the Dragon', 'First Flight (Poem): For Anne Gregory',
+      'Footprints: A Triumph of Surgery', 'Footprints: The Thief\'s Story', 
+      'Footprints: The Midnight Visitor', 'Footprints: A Question of Trust', 
+      'Footprints: Footprints without Feet', 'Footprints: The Making of a Scientist',
+      'Footprints: The Necklace', 'Footprints: The Hack Driver', 'Footprints: Bholi'
+    ],
+    'Hindi': [
+      'Kshitij-2: Surdas', 'Kshitij-2: Tulsidas', 'Kshitij-2: Suryakant Tripathi Nirala', 
+      'Kritika-2: Mata ka Anchal', 'Kritika-2: George Pancham Ki Naak'
+    ]
+  },
+  '11': {
+    'Physics': [
+      'C1: Physical World (NCERT)', 'C2: Units and Dimensions (JEE/NCERT)', 'C3: Motion in a Straight Line (NCERT)', 
+      'C4: Motion in a Plane (NCERT/JEE)', 'C5: Laws of Motion (JEE/NCERT)', 'C6: Work, Energy and Power (JEE/NCERT)', 
+      'C7: System of Particles and Rotational Motion (JEE/NCERT)', 'C8: Gravitation (NCERT/JEE)', 
+      'C9: Mechanical Properties of Solids (NCERT)', 'C10: Mechanical Properties of Fluids (NCERT)', 
+      'C11: Thermal Properties of Matter (NCERT)', 'C12: Thermodynamics (JEE/NCERT)', 
+      'C13: Kinetic Theory (NCERT)', 'C14: Oscillations (NCERT/JEE)', 'C15: Waves (NCERT/JEE)'
+    ],
+    'Chemistry': [
+      'C1: Basic Concepts of Chemistry (JEE/NCERT)', 'C2: Structure of Atom (JEE/NCERT)', 
+      'C3: Classification of Elements and Periodicity (NCERT)', 'C4: Chemical Bonding and Molecular Structure (JEE/NCERT)', 
+      'C5: States of Matter (NCERT)', 'C6: Thermodynamics (NCERT/JEE)', 'C7: Equilibrium (JEE/NCERT)', 
+      'C8: Redox Reactions (NCERT)', 'C9: Hydrogen (NCERT)', 'C10: s-Block Elements (NCERT)', 
+      'C11: p-Block Elements (Group 13-14) (NCERT)', 'C12: Organic Chemistry Basic Principles (JEE/NCERT)', 
+      'C13: Hydrocarbons (JEE/NCERT)', 'C14: Environmental Chemistry (NCERT)'
+    ],
+    'Math': [
+      'C1: Sets (NCERT/JEE)', 'C2: Relations and Functions (NCERT/JEE)', 'C3: Trigonometric Functions (JEE/NCERT)', 
+      'C4: Principle of Mathematical Induction (NCERT)', 'C5: Complex Numbers and Quadratic Equations (JEE/NCERT)', 
+      'C6: Linear Inequalities (NCERT)', 'C7: Permutations and Combinations (NCERT/JEE)', 
+      'C8: Binomial Theorem (NCERT/JEE)', 'C9: Sequences and Series (JEE/NCERT)', 'C10: Straight Lines (NCERT/JEE)', 
+      'C11: Conic Sections (JEE/NCERT)', 'C12: Introduction to 3D Geometry (NCERT)', 
+      'C13: Limits and Derivatives (NCERT/JEE)', 'C14: Mathematical Reasoning (JEE)', 
+      'C15: Statistics (NCERT)', 'C16: Probability (NCERT/JEE)'
+    ],
+    'Biology': [
+      'C1: The Living World (NCERT)', 'C2: Biological Classification (NCERT)', 'C3: Plant Kingdom (NCERT)', 
+      'C4: Animal Kingdom (NCERT)', 'C5: Morphology of Flowering Plants (NCERT)', 
+      'C6: Anatomy of Flowering Plants (NCERT)', 'C7: Structural Organisation in Animals (NCERT)', 
+      'C8: Cell: The Unit of Life (NCERT)', 'C9: Biomolecules (NCERT)', 'C10: Cell Cycle and Cell Division (NCERT)', 
+      'C11: Transport in Plants (NCERT)', 'C12: Mineral Nutrition (NCERT)', 
+      'C13: Photosynthesis in Higher Plants (NCERT)', 'C14: Respiration in Plants (NCERT)', 
+      'C15: Plant Growth and Development (NCERT)', 'C16: Digestion and Absorption (NCERT)', 
+      'C17: Breathing and Exchange of Gases (NCERT)', 'C18: Body Fluids and Circulation (NCERT)', 
+      'C19: Excretory Products and their Elimination (NCERT)', 'C20: Locomotion and Movement (NCERT)', 
+      'C21: Neural Control and Coordination (NCERT)', 'C22: Chemical Coordination and Integration (NCERT)'
+    ]
+  },
+  '12': {
+    'Physics': [
+      'C1: Electric Charges and Fields (NCERT/JEE)', 'C2: Electrostatic Potential and Capacitance (NCERT/JEE)', 
+      'C3: Current Electricity (NCERT/JEE)', 'C4: Moving Charges and Magnetism (NCERT/JEE)', 
+      'C5: Magnetism and Matter (NCERT)', 'C6: Electromagnetic Induction (NCERT)', 
+      'C7: Alternating Current (NCERT/JEE)', 'C8: Electromagnetic Waves (NCERT)', 
+      'C9: Ray Optics and Optical Instruments (NCERT/JEE)', 'C10: Wave Optics (NCERT/JEE)', 
+      'C11: Dual Nature of Radiation and Matter (NCERT/JEE)', 'C12: Atoms (NCERT)', 
+      'C13: Nuclei (NCERT/JEE)', 'C14: Semiconductor Electronics (NCERT/JEE)'
+    ],
+    'Chemistry': [
+      'C1: The Solid State (NCERT)', 'C2: Solutions (NCERT/JEE)', 'C3: Electrochemistry (NCERT/JEE)', 
+      'C4: Chemical Kinetics (NCERT/JEE)', 'C5: Surface Chemistry (NCERT)', 'C6: General Principles of Isolation of Elements (NCERT)', 
+      'C7: p-Block Elements (Group 15-18) (NCERT/JEE)', 'C8: d and f Block Elements (NCERT/JEE)', 
+      'C9: Coordination Compounds (NCERT/JEE)', 'C10: Haloalkanes and Haloarenes (NCERT/JEE)', 
+      'C11: Alcohols, Phenols and Ethers (NCERT/JEE)', 'C12: Aldehydes, Ketones and Carboxylic Acids (NCERT/JEE)', 
+      'C13: Amines (NCERT/JEE)', 'C14: Biomolecules (NCERT/JEE)', 'C15: Polymers (NCERT)', 
+      'C16: Chemistry in Everyday Life (NCERT)'
+    ],
+    'Math': [
+      'C1: Relations and Functions (NCERT/JEE)', 'C2: Inverse Trigonometric Functions (NCERT/JEE)', 
+      'C3: Matrices (NCERT/JEE)', 'C4: Determinants (NCERT/JEE)', 
+      'C5: Continuity and Differentiability (NCERT/JEE)', 'C6: Application of Derivatives (NCERT/JEE)', 
+      'C7: Integrals (NCERT/JEE)', 'C8: Application of Integrals (NCERT)', 
+      'C9: Differential Equations (NCERT/JEE)', 'C10: Vector Algebra (NCERT/JEE)', 
+      'C11: Three Dimensional Geometry (NCERT/JEE)', 'C12: Linear Programming (NCERT)', 
+      'C13: Probability (NCERT/JEE)'
+    ],
+    'Biology': [
+      'C1: Reproduction in Organisms (NCERT)', 'C2: Sexual Reproduction in Flowering Plants (NCERT/NEET)', 
+      'C3: Human Reproduction (NCERT/NEET)', 'C4: Reproductive Health (NCERT)', 
+      'C5: Principles of Inheritance and Variation (NCERT/NEET)', 'C6: Molecular Basis of Inheritance (NCERT/NEET)', 
+      'C7: Evolution (NCERT)', 'C8: Human Health and Disease (NCERT)', 
+      'C9: Strategies for Enhancement in Food Production (NCERT)', 'C10: Microbes in Human Welfare (NCERT)', 
+      'C11: Biotechnology: Principles and Processes (NCERT/NEET)', 'C12: Biotechnology and its Applications (NCERT/NEET)', 
+      'C13: Organisms and Populations (NCERT)', 'C14: Ecosystem (NCERT)', 
+      'C15: Biodiversity and Conservation (NCERT)', 'C16: Environmental Issues (NCERT)'
+    ],
+    'English': [
+      'Flamingo: The Last Lesson', 'Flamingo: Lost Spring', 'Flamingo: Deep Water', 'Flamingo: The Rattrap', 'Flamingo: Indigo', 
+      'Vistas: The Third Level', 'Vistas: The Tiger King', 'Vistas: Journey to the End of the Earth', 'Vistas: The Enemy'
+    ],
+    'Hindi': [
+      'Aroh-2: Harivansh Rai Bachchan', 'Aroh-2: Alok Dhanva', 'Aroh-2: Kunwar Narayan', 
+      'Vitan-2: Silver Wedding', 'Vitan-2: Joojh', 'Vitan-2: Ateet Mein Dabe Paon'
+    ]
+  }
+};
+const ICON_MAP = {
+  'Physics': '⚛️', 'Chemistry': '🧪', 'Math': '➗', 'Biology': '🧬', 'English': '📝', 'Hindi': '🔤'
+};
+// /UPDATED
+
+/* ---------- Router (hash-based) + Back button ---------- */
+function showPageInApp(id){
+  document.querySelectorAll('#pageApp .page').forEach(p=>p.classList.remove('active'));
+  const el = document.querySelector(`#pageApp #${id}`);
+  if(el){ el.classList.add('active'); location.hash = id; }
+}
+window.addEventListener('hashchange', ()=>{
+  // only switch inside app shell
+  if($('pageApp').classList.contains('active')){
+    const id = (location.hash||'#home').slice(1);
+    showPageInApp(id);
+  }
+});
+$('backBtn').onclick = ()=> history.back();
+
+/* ---------- Session (30 days) ---------- */
+function setLogin(mobile){
+  const exp = Date.now() + 30*24*60*60*1000;
+  localStorage.setItem('PW_LOGIN', JSON.stringify({mobile,exp}));
+}
+function isLoggedIn(){
+  try{
+    const obj = JSON.parse(localStorage.getItem('PW_LOGIN')||'null');
+    return obj && obj.exp && Date.now() < obj.exp;
+  }catch{ return false; }
+}
+
+/* ---------- Profile helpers ---------- */
+function saveProfile(obj){
+  localStorage.setItem('PW_PROFILE', JSON.stringify(obj||{}));
+}
+function getProfile(){
+  try{ return JSON.parse(localStorage.getItem('PW_PROFILE')||'{}'); }catch{ return {}; }
+}
+function initialsFromName(name=''){
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0]||'';
+  const last = parts.length>1 ? parts[parts.length-1][0] : '';
+  return (first+last).toUpperCase() || 'PW';
+}
+function refreshAvatar(){
+  $('avatar').textContent = initialsFromName(getProfile().name||'');
+}
+
+/* ---------- Login flow (fixed: page not vanishing) ---------- */
+function goLogin(){            // show login only
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('pageLogin').classList.add('active');
+}
+function goProfile(){          // show profile creation
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('pageProfile').classList.add('active');
+}
+function goApp(){              // show app shell + home
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  $('pageApp').classList.add('active');
+  showPageInApp('home');
+  refreshAvatar();
+}
+
+/* first load gate */
+(function gate(){
+  if(!isLoggedIn()) { goLogin(); return; }
+  const p = getProfile();
+  if(!p.name || !p.city || !p.gender){ goProfile(); return; }
+  goApp();
+})();
+
+/* Student login (no OTP) -> go home immediately, persist 30 days */
+$('btnStudentLogin').onclick = ()=>{
+  const m = $('mob').value.trim();
+  if(!/^[6-9]\d{9}$/.test(m)) { alert('Valid 10-digit mobile daaliye'); return; }
+  setLogin(m);
+  // If no profile, go profile. Else home.
+  const p = getProfile();
+  if(!p.name || !p.city || !p.gender){ goProfile(); }
+  else { goApp(); }
+};
+
+/* Save profile then home */
+$('btnSaveProfile').onclick = ()=>{
+  const obj = {
+    name: $('p_name').value.trim(),
+    city: $('p_city').value.trim(),
+    gender: $('p_gender').value.trim(),
+    email: $('p_email').value.trim()
+  };
+  if(!obj.name || !obj.city || !obj.gender){ alert('Please fill all fields'); return; }
+  saveProfile(obj);
+  goApp();
+};
+
+/* Avatar click -> quick edit modal */
+$('avatar').onclick = ()=>{
+  const p = getProfile();
+  $('e_name').value = p.name||'';
+  $('e_city').value = p.city||'';
+  $('e_gender').value = p.gender||'Male';
+  $('e_email').value = p.email||'';
+  $('profileModal').style.display='flex';
+};
+$('btnCloseProfile').onclick = ()=> $('profileModal').style.display='none';
+$('btnUpdateProfile').onclick = ()=>{
+  saveProfile({
+    name:$('e_name').value.trim(),
+    city:$('e_city').value.trim(),
+    gender:$('e_gender').value.trim(),
+    email:$('e_email').value.trim()
+  });
+  refreshAvatar();
+  $('profileModal').style.display='none';
+};
+
+/* Admin open from login and from home */
+$('openAdminFromLogin').onclick = ()=> { openAdminModal(); };
+document.addEventListener('click', (e)=>{
+  const card = e.target.closest('.card[data-nav]');
+  if(!card) return;
+  const target = card.dataset.nav;
+  if(target==='admin'){ openAdminModal(); return; }
+  // inside app shell
+  if($('pageApp').classList.contains('active')){
+    if (target === 'contact') {
+      const link = $('contactLinkDisplay').href;
+      if (link && link !== '#') {
+        window.open(link, '_blank');
+      } else {
+        alert('Support link is not set yet. Please check back later.');
+      }
+      return;
+    }
+    showPageInApp(target);
+  }
+});
+
+/* ---------- Magic tap sparkle (localized) ---------- */
+document.addEventListener('click', (e)=>{
+  const d=document.createElement('div');
+  d.textContent='✨'; d.style.position='fixed'; d.style.left=e.clientX+'px'; d.style.top=e.clientY+'px';
+  d.style.pointerEvents='none'; d.style.fontSize='18px'; d.style.transition='all .6s ease'; d.style.opacity='1';
+  document.body.appendChild(d);
+  setTimeout(()=>{d.style.opacity='0'; d.style.transform='translateY(-18px)'},20);
+  setTimeout(()=>d.remove(),650);
+});
+
+/* ---------- Firebase state & renderers (MODIFIED) ---------- */
+const state={lectures:[],notes:[],anns:[], contactLink:''};
+
+db.ref('/').on('value', snap=>{
+  const d = snap.val()||{};
+  state.lectures = d.lectures||[];
+  state.notes    = d.notes||[];
+  state.anns     = d.announcements||[];
+  state.contactLink = d.admin?.contactLink || 'https://instagram.com/its_piyush_0575'; // Default link
+  
+  renderNotes(); 
+  renderAnns(); 
+  renderAdminAnnouncements(); // Separate admin ann list
+  renderContactLink(); // Update the student contact link
+  
+  // Only refresh admin lecture list if admin is open and filters are set
+  if ($('adminPanel').style.display !== 'none' && $('filterLecClass').value && $('filterLecSubject').value) {
+    renderAdminLectures();
+  } else if ($('adminPanel').style.display !== 'none') {
+    // Hide list and show message if filters are not set
+    $('adminLectures').innerHTML = '';
+    $('lecFilterInfo').style.display = 'block';
+  }
+});
+
+function renderContactLink() {
+  const linkEl = $('contactLinkDisplay');
+  const link = state.contactLink || '#';
+  linkEl.href = link;
+  linkEl.textContent = link.startsWith('http') ? new URL(link).hostname : 'No link set';
+}
+
+/* YouTube ID + thumbnail (HQ) */
+function ytId(url=''){
+  try{
+    if(url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?&#]/)[0];
+    if(url.includes('v='))       return url.split('v=')[1].split(/[?&#]/)[0];
+    if(url.includes('/embed/'))  return url.split('/embed/')[1].split(/[?&#]/)[0];
+  }catch{}
+  return '';
+}
+function youtubeThumb(url){
+  const id = ytId(url);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : '';
+}
+
+/* generic thumbnail maker with fallback */
+function makeThumb(urlVideo, urlThumb){
+  const img = new Image();
+  img.decoding='async'; img.loading='lazy'; img.referrerPolicy='no-referrer';
+  const derived = urlThumb && urlThumb.trim() ? urlThumb : youtubeThumb(urlVideo);
+  img.src = derived || 'https://via.placeholder.com/300x200.png?text=Thumbnail';
+  img.onload = ()=> img.classList.add('loaded');
+  img.onerror= ()=>{ img.src='https://via.placeholder.com/300x200.png?text=No+Image'; img.classList.add('loaded'); };
+  return img;
+}
+
+/* Subject route (MODIFIED: now leads to Chapters) */
+document.querySelectorAll('.subj').forEach(el=>{
+  el.addEventListener('click', ()=>{
+    const klass = el.dataset.class, subj = el.dataset.subject;
+    openChapters(klass, subj);
+  });
+});
+
+/* NEW: Open Chapter List */
+function openChapters(klass, subj){
+  $('chapterListTitle').textContent = subj;
+  $('chapterListMeta').textContent  = 'Class '+klass;
+  renderChapterList(klass, subj);
+  if(!$('pageApp').classList.contains('active')) goApp();
+  showPageInApp('chapterList');
+}
+
+/* NEW: Render Chapter List */
+function renderChapterList(klass, subj){
+  const box = $('chaptersGrid'); box.innerHTML='';
+  const chapters = CHAPTERS[klass]?.[subj] || [];
+  if(!chapters.length){ box.innerHTML = "<div class='item' style='grid-column:1/span 2;'><div class='info'><div class='meta'>No chapters listed for this subject.</div></div></div>"; return; }
+  
+  chapters.forEach(chapterName=>{
+    const card = document.createElement('div'); card.className='card chapter-card';
+    card.dataset.class = klass;
+    card.dataset.subject = subj;
+    card.dataset.chapter = chapterName;
+    // Chapter cards use a simpler design structure, borrowing card styles
+    card.innerHTML = `<div class="icon">${ICON_MAP[subj] || '📘'}</div>
+                      <div class="label">${chapterName}</div>
+                      <div class="hint">Lectures & PDFs</div>`;
+    card.onclick = ()=> openLectures(klass, subj, chapterName);
+    box.appendChild(card);
+  });
+}
+
+/* MODIFIED: Open Lectures (now for a specific chapter) */
+function openLectures(klass, subj, chapter){
+  $('subjectTitle').textContent = chapter;
+  $('subjectMeta').textContent  = `${subj} • Class ${klass}`;
+  renderLectureList(klass, subj, chapter);
+  if(!$('pageApp').classList.contains('active')) goApp();
+  showPageInApp('subjectList'); // 'subjectList' is now the lecture list page
+}
+
+/* MODIFIED: Render Lecture List (now filters by chapter) */
+function renderLectureList(klass, subj, chapter){
+  const box = $('subjectLectures');
+  box.innerHTML = '';
+
+  const list = (state.lectures || []).filter(l =>
+    String(l.class) === String(klass) &&
+    l.subject === subj &&
+    l.chapter === chapter
+  );
+
+  if(!list.length){
+    box.innerHTML =
+      "<div class='item'><div class='info'><div class='meta'>No lectures uploaded for this chapter.</div></div></div>";
+    return;
+  }
+
+  list.forEach(l=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+
+    const link = l.video || l.pdf;
+
+    // 🔥 CLICK ANYWHERE → DIRECT YOUTUBE / PDF
+    row.onclick = () => window.open(link, '_blank');
+
+    const th = document.createElement('div');
+    th.className = 'thumb';
+    th.appendChild(makeThumb(l.video||'', l.thumbnail||''));
+
+    const inf = document.createElement('div');
+    inf.className = 'info';
+    inf.innerHTML = `
+      <div class="title">${l.title || 'Untitled'}</div>
+      <div class="meta">Class ${l.class} • ${l.subject}</div>
+    `;
+
+    const btn = document.createElement('button');
+    btn.className = 'ghost';
+    btn.textContent = 'Open';
+    btn.onclick = (e)=>{
+      e.stopPropagation();
+      window.open(link,'_blank');
+    };
+
+    row.appendChild(th);
+    row.appendChild(inf);
+    row.appendChild(btn);
+    box.appendChild(row);
+  });
+}
+
+/* Notes render + filter */
+function renderNotes(){
+  const cls = $('filterClass')?.value||'';
+  const sub = $('filterSubject')?.value||'';
+  const box = $('notesList'); if(!box) return;
+  box.innerHTML='';
+  let list = state.notes||[];
+  if(cls) list = list.filter(n=> String(n.class)===String(cls));
+  if(sub) list = list.filter(n=> n.subject===sub);
+  if(!list.length){ box.innerHTML="<div class='item'><div class='info'><div class='meta'>No notes</div></div></div>"; return;}
+  list.forEach(n=>{
+    const it=document.createElement('div'); it.className='item';
+    it.innerHTML = `<div class="info"><div class="title">${n.title} <span class="meta">(Class ${n.class} • ${n.subject})</span></div>
+                    <div class="meta"><a href="${n.url}" target="_blank">Open PDF</a></div></div>`;
+    box.appendChild(it);
+  });
+}
+$('applyNotesFilter').onclick = ()=> renderNotes();
+
+/* Announcements (Student view) */
+function renderAnns(){
+  const box = $('annsList'); if(!box) return; box.innerHTML='';
+  (state.anns||[]).forEach(a=>{
+    const it=document.createElement('div'); it.className='item';
+    let linkHTML = '';
+    if (a.link && a.link.startsWith('http')) {
+      linkHTML = `<div class="meta" style="margin-top:6px;"><a href="${a.link}" target="_blank">View Attached Link</a></div>`;
+    }
+    it.innerHTML = `<div class="info"><div class="title">${a.title}</div><div class="meta" style="color:${a.link?'var(--ink)':'var(--muted)'};">${a.body}</div>${linkHTML}</div>`;
+    box.appendChild(it);
+  });
+}
+
+/* ---------- Admin (UPDATED) ---------- */
+let adminOK=false, editLIndex=null, editNIndex=null;
+
+function openAdminModal(){
+  $('denied').style.display='none';
+  $('adminLoginBlock').style.display='block';
+  $('adminPanel').style.display='none';
+  $('adminModal').style.display='flex';
+  populateLecChapters(); // Initial chapter load for ADD form
+  loadAdminSettings(); // Load settings data
+}
+
+$('adminLoginBtn').onclick = async ()=>{
+  const pass = $('adminPass').value.trim();
+  const real = (await db.ref('admin/password').once('value')).val();
+  if(pass===real){
+    adminOK=true;
+    $('adminLoginBlock').style.display='none';
+    $('adminPanel').style.display='block';
+    // Initial content setup for the first tab
+    renderAdminNotes();
+    renderAdminAnnouncements();
+    // Default to the first filter (All/All) to show all lectures if possible
+    $('filterLecClass').value = '';
+    $('filterLecSubject').value = '';
+    renderAdminLectures(); // Initial render
+  }else{
+    adminOK=false;
+    $('denied').style.display='block';
+  }
+};
+$('adminLogoutBtn').onclick = ()=>{
+  adminOK=false; editLIndex=null; editNIndex=null;
+  $('adminModal').style.display='none';
+};
+
+/* Admin Tabs Logic */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.onclick = function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        this.classList.add('active');
+        $(this.dataset.tab).classList.add('active');
+        
+        if (this.dataset.tab === 'tabLectures') {
+             // Re-render lectures list when tab is clicked
+             renderAdminLectures();
+        }
+    };
+});
+
+
+/* Dynamic Chapter Population */
+function populateLecChapters(selectedChapter = null) {
+  const cls = $('lecClass').value;
+  const subj = $('lecSubject').value;
+  const chapSelect = $('lecChapter');
+  chapSelect.innerHTML = '';
+  
+  const chapters = CHAPTERS[cls]?.[subj] || [];
+  
+  if (chapters.length === 0) {
+    chapSelect.innerHTML = '<option value="">No chapters found</option>';
+    return;
+  }
+  
+  const defaultOpt = document.createElement('option');
+  defaultOpt.value = "";
+  defaultOpt.textContent = "Select Chapter";
+  chapSelect.appendChild(defaultOpt);
+
+  chapters.forEach(chapterName => {
+    const opt = document.createElement('option');
+    opt.value = chapterName;
+    opt.textContent = chapterName;
+    chapSelect.appendChild(opt);
+  });
+
+  if (selectedChapter) {
+    chapSelect.value = selectedChapter;
+  } else {
+    chapSelect.value = "";
+  }
+}
+
+// Attach listeners for dynamic chapter loading on ADD/EDIT form
+$('lecClass').onchange = () => populateLecChapters();
+$('lecSubject').onchange = () => populateLecChapters();
+
+/* Admin: Save / Update / Delete Lectures */
+function clearLectureEdit(){
+  editLIndex=null;
+  $('updateLectureBtn').disabled=true;
+  $('cancelLectureEditBtn').disabled=true;
+  $('saveLectureBtn').disabled=false;
+  $('lecTitle').value=''; $('lecLink').value=''; $('lecThumb').value='';
+  $('lecClass').value='10'; 
+  $('lecSubject').value='Physics'; 
+  populateLecChapters(); 
+}
+$('saveLectureBtn').onclick = async ()=>{
+  if(!adminOK) return alert('Login first');
+  const c=$('lecClass').value, s=$('lecSubject').value, ch=$('lecChapter').value,
+        t=$('lecTitle').value.trim(), link=$('lecLink').value.trim(), th=$('lecThumb').value.trim();
+  if(!t || !link || !ch) return alert('Fill Title, Link, and select Chapter');
+  const snap = await db.ref('lectures').once('value'); const arr = snap.val()||[];
+  arr.unshift({class:c,subject:s,chapter:ch,title:t,video:link.endsWith('.pdf')?'':link,pdf:link.endsWith('.pdf')?link:'',thumbnail:th,created:Date.now()});
+  await db.ref('lectures').set(arr);
+  clearLectureEdit(); alert('Lecture saved');
+};
+$('updateLectureBtn').onclick = async ()=>{
+  if(editLIndex===null) return;
+  const snap=await db.ref('lectures').once('value'); const arr=snap.val()||[];
+  const c=$('lecClass').value, s=$('lecSubject').value, ch=$('lecChapter').value,
+        t=$('lecTitle').value.trim(), link=$('lecLink').value.trim(), th=$('lecThumb').value.trim();
+  arr[editLIndex] = {class:c,subject:s,chapter:ch,title:t,video:link.endsWith('.pdf')?'':link,pdf:link.endsWith('.pdf')?link:'',thumbnail:th,created:arr[editLIndex]?.created||Date.now()};
+  await db.ref('lectures').set(arr);
+  clearLectureEdit(); alert('Lecture updated');
+};
+$('cancelLectureEditBtn').onclick = clearLectureEdit;
+
+/* Admin: Save / Update / Delete Notes */
+function clearNoteEdit(){
+  editNIndex=null;
+  $('updateNoteBtn').disabled=true; $('cancelNoteEditBtn').disabled=true; $('saveNoteBtn').disabled=false;
+  $('noteTitle').value=''; $('noteLink').value='';
+}
+$('saveNoteBtn').onclick = async ()=>{
+  if(!adminOK) return alert('Login first');
+  const c=$('noteClass').value, s=$('noteSubject').value, t=$('noteTitle').value.trim(), u=$('noteLink').value.trim();
+  if(!t || !u) return alert('Fill Title & Link');
+  const snap=await db.ref('notes').once('value'); const arr=snap.val()||[];
+  arr.unshift({class:c,subject:s,title:t,url:u,created:Date.now()});
+  await db.ref('notes').set(arr);
+  clearNoteEdit(); renderAdminNotes(); alert('Note saved');
+};
+$('updateNoteBtn').onclick = async ()=>{
+  if(editNIndex===null) return;
+  const snap=await db.ref('notes').once('value'); const arr=snap.val()||[];
+  const c=$('noteClass').value, s=$('noteSubject').value, t=$('noteTitle').value.trim(), u=$('noteLink').value.trim();
+  arr[editNIndex] = {class:c,subject:s,title:t,url:u,created:arr[editNIndex]?.created||Date.now()};
+  await db.ref('notes').set(arr);
+  clearNoteEdit(); renderAdminNotes(); alert('Note updated');
+};
+$('cancelNoteEditBtn').onclick = clearNoteEdit;
+
+/* Admin: Post Announcement (UPDATED to include Link) */
+$('postAnnBtn').onclick = async ()=>{
+  if(!adminOK) return alert('Login first');
+  const t=$('annTitle').value.trim(), b=$('annBody').value.trim(), l=$('annLink').value.trim();
+  if(!t || !b) return alert('Title and Message are required.');
+  const snap=await db.ref('announcements').once('value'); const arr=snap.val()||[];
+  arr.unshift({title:t,body:b,link:l,created:Date.now()});
+  await db.ref('announcements').set(arr);
+  $('annTitle').value=''; $('annBody').value=''; $('annLink').value='';
+  renderAdminAnnouncements(); alert('Announcement posted');
+};
+
+/* Admin: Manage Support Link */
+function loadAdminSettings() {
+    $('supportLinkInput').value = state.contactLink || '';
+}
+$('saveSupportLinkBtn').onclick = async () => {
+    if(!adminOK) return alert('Login first');
+    const link = $('supportLinkInput').value.trim();
+    if (!link) {
+        if (!confirm('Are you sure you want to remove the contact support link?')) return;
+    }
+    await db.ref('admin/contactLink').set(link);
+    alert('Support link updated.');
+};
+
+
+/* Admin: Render filtered Lecture list (NEW) */
+$('filterLecClass').onchange = renderAdminLectures;
+$('filterLecSubject').onchange = renderAdminLectures;
+
+function renderAdminLectures(){
+  const L = $('adminLectures'); if(!L) return; L.innerHTML='';
+  const fClass = $('filterLecClass').value;
+  const fSubject = $('filterLecSubject').value;
+  
+  if (!fClass || !fSubject) {
+    $('lecFilterInfo').style.display = 'block';
+    return;
+  }
+  
+  $('lecFilterInfo').style.display = 'none';
+
+  const filteredList = (state.lectures||[]).filter(l=>
+    (fClass === '' || String(l.class) === String(fClass)) &&
+    (fSubject === '' || l.subject === fSubject)
+  );
+
+  if (!filteredList.length) {
+    L.innerHTML = "<div class='item'><div class='info'><div class='meta'>No lectures found for this selection.</div></div></div>";
+    return;
+  }
+
+  filteredList.forEach((l,idx)=>{
+    // We need to find the original index in state.lectures for editing/deleting
+    const originalIndex = state.lectures.findIndex(item => item === l);
+    if(originalIndex === -1) return; // Should not happen
+    
+    const row=document.createElement('div'); row.className='item';
+    const th=document.createElement('div'); th.className='thumb'; th.appendChild(makeThumb(l.video||'', l.thumbnail||''));
+    const inf=document.createElement('div'); inf.className='info';
+    inf.innerHTML=`<div class="title">${l.title}</div><div class="meta">Class ${l.class} • ${l.subject} • ${l.chapter||'N/A'}</div>`;
+    const acts=document.createElement('div'); acts.className='actions';
+    
+    const e=document.createElement('button'); e.className='ghost'; e.textContent='Edit';
+    e.onclick=()=>{ 
+      editLIndex=originalIndex; 
+      $('lecClass').value=l.class; 
+      $('lecSubject').value=l.subject; 
+      populateLecChapters(l.chapter); 
+      $('lecTitle').value=l.title; 
+      $('lecLink').value=l.video||l.pdf||''; 
+      $('lecThumb').value=l.thumbnail||''; 
+      $('updateLectureBtn').disabled=false; 
+      $('cancelLectureEditBtn').disabled=false; 
+      $('saveLectureBtn').disabled=true; 
+      // Switch back to Add/Edit view
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="tabLectures"]').classList.add('active');
+      $('#tabLectures').classList.add('active');
+      $('adminModal').scrollTop = 0; // Scroll to the top of the modal
+    };
+    
+    const d=document.createElement('button'); d.className='btn'; d.textContent='Delete';
+    d.onclick=async()=>{ 
+      if(!confirm(`Delete lecture: ${l.title}?`))return; 
+      const snap=await db.ref('lectures').once('value'); 
+      const arr=snap.val()||[]; 
+      arr.splice(originalIndex,1); 
+      await db.ref('lectures').set(arr); 
+      alert('Deleted'); 
+    };
+    acts.appendChild(e); acts.appendChild(d);
+    row.appendChild(th); row.appendChild(inf); row.appendChild(acts); L.appendChild(row);
+  });
+}
+
+
+/* Admin: Render Notes list */
+function renderAdminNotes(){
+  const N = $('adminNotes'); if(!N) return; N.innerHTML='';
+  (state.notes||[]).forEach((n,idx)=>{
+    const row=document.createElement('div'); row.className='item';
+    const inf=document.createElement('div'); inf.className='info';
+    inf.innerHTML=`<div class="title">${n.title}</div><div class="meta">Class ${n.class} • ${n.subject}</div>`;
+    const acts=document.createElement('div'); acts.className='actions';
+    const e=document.createElement('button'); e.className='ghost'; e.textContent='Edit';
+    e.onclick=()=>{ 
+      editNIndex=idx; 
+      $('noteClass').value=n.class; 
+      $('noteSubject').value=n.subject; 
+      $('noteTitle').value=n.title; 
+      $('noteLink').value=n.url; 
+      $('updateNoteBtn').disabled=false; 
+      $('cancelNoteEditBtn').disabled=false; 
+      $('saveNoteBtn').disabled=true;
+      // Switch back to Add/Edit view
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.querySelector('[data-tab="tabNotes"]').classList.add('active');
+      $('#tabNotes').classList.add('active');
+      $('adminModal').scrollTop = 0; // Scroll to the top of the modal
+    };
+    const d=document.createElement('button'); d.className='btn'; d.textContent='Delete';
+    d.onclick=async()=>{ if(!confirm('Delete note?'))return; const snap=await db.ref('notes').once('value'); const arr=snap.val()||[]; arr.splice(idx,1); await db.ref('notes').set(arr); alert('Deleted'); };
+    acts.appendChild(e); acts.appendChild(d);
+    row.appendChild(inf); row.appendChild(acts); N.appendChild(row);
+  });
+}
+
+/* Admin: Render Announcements list (NEW) */
+function renderAdminAnnouncements(){
+    const A = $('adminAnns'); if(!A) return; A.innerHTML='';
+    (state.anns||[]).forEach((a,idx)=>{
+      const row=document.createElement('div'); row.className='item';
+      let linkHTML = '';
+      if (a.link && a.link.startsWith('http')) {
+        linkHTML = `<div class="meta" style="margin-top:4px;"><a href="${a.link}" target="_blank">View Link</a></div>`;
+      }
+      const inf=document.createElement('div'); inf.className='info';
+      inf.innerHTML=`<div class="title">${a.title}</div><div class="meta">${a.body}</div>${linkHTML}`;
+      
+      const acts=document.createElement('div'); acts.className='actions';
+      const d=document.createElement('button'); d.className='btn' ; d.textContent='Delete';
+      d.onclick=async()=>{ 
+        if(!confirm(`Delete announcement: ${a.title}?`))return; 
+        const snap=await db.ref('announcements').once('value'); 
+        const arr=snap.val()||[]; 
+        arr.splice(idx,1); 
+        await db.ref('announcements').set(arr); 
+        alert('Deleted'); 
+      };
+      acts.appendChild(d);
+      row.appendChild(inf); row.appendChild(acts); A.appendChild(row);
+    });
+}
+
+/* hide any splash remnants & ensure avatar initials at start */
+window.onload = ()=>{
+  refreshAvatar();
+};
+</script>
+
+</body>
+</html>
